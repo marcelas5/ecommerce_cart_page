@@ -21,8 +21,9 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
     quantity.addEventListener("change", () => {
-      productElement.querySelector("[data-cart-product-price]").innerHTML =
-        productAmount(productElement);
+      productElement.querySelector(
+        "[data-cart-product-price]"
+      ).innerHTML = `$ ${productAmount(productElement)}`;
 
       const products = Array.from(
         document.querySelectorAll("[data-cart-product]")
@@ -31,7 +32,12 @@ document.addEventListener("DOMContentLoaded", () => {
         return accumulator + productAmount(product);
       }, 0);
 
-      subototalElement.innerHTML = subtotal;
+      subototalElement.innerHTML = `$ ${subtotal}`;
+      totalElement.innerHTML = `$ ${
+        subtotal +
+        parseInt(shippingElement.dataset.cartShippingAmount) +
+        parseInt(taxElement.dataset.cartTaxAmount)
+      }`;
     });
   });
 });
