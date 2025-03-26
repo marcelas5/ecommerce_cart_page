@@ -1,131 +1,76 @@
-const productAmount = (productElement) => {
-  const amount = parseInt(productElement.dataset.cartProductAmount);
-  const quantity = productElement.querySelector(
-    "[data-cart-product-quantity]"
-  ).value;
+class Cart {
+  constructor() {
+    this.subtotalElement = document.querySelector("[data-cart-subtotal]");
+    this.products = Array.from(
+      document.querySelectorAll("[data-cart-product]")
+    ).map((element) => new Product(element, this));
+    this.orderSummaryEl = document.querySelector("[data-order-summary]");
+    this.removeOrderSummaryEl = document.querySelector(
+      "[data-remove-order-summary]"
+    );
+    this.toggleVisibility();
+    this.totalElement = document.querySelector("[data-cart-total]");
+    this.shippingElement = document.querySelector("[data-cart-shipping]");
+    this.taxElement = document.querySelector("[data-cart-tax]");
+  }
 
-  return amount * quantity;
-};
+  productUpdated() {
+    // update subtotal
+    this.subtotalElement.innerHTML = `$ ${this.subtotal}`;
+    this.totalElement.innerHTML = `$ ${
+      this.subtotal +
+      parseInt(this.taxElement.dataset.cartTaxAmount) +
+      parseInt(this.shippingElement.dataset.cartShippingAmount)
+    }`;
+  }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const subototalElement = document.querySelector("[data-cart-subtotal]");
-  const shippingElement = document.querySelector("[data-cart-shipping]");
-  const taxElement = document.querySelector("[data-cart-tax]");
-  const totalElement = document.querySelector("[data-cart-total]");
+  get subtotal() {
+    return this.products.reduce((accumulator, product) => {
+      return accumulator + product.price;
+    }, 0);
+  }
 
-  const productElements = document.querySelectorAll("[data-cart-product]");
+  toggleVisibility() {
+    this.removeOrderSummaryEl.addEventListener("click", () => {
+      if (this.orderSummaryEl.style.display === "none") {
+        this.orderSummaryEl.style.display = "block"; // Show the element
+      } else {
+        this.orderSummaryEl.style.display = "none"; // Hide the element
+      }
+    });
+  }
+}
 
-  productElements.forEach((productElement) => {
-    const quantity = productElement.querySelector(
+class Product {
+  constructor(element, cart) {
+    this.element = element;
+    this.cart = cart;
+    this.amount = parseInt(element.dataset.cartProductAmount);
+    this.quantityElement = element.querySelector(
       "[data-cart-product-quantity]"
     );
+    this.quantity = parseInt(this.quantityElement.value);
+    this.priceElement = element.querySelector("[data-cart-product-price]");
+    this.init();
+  }
 
-    quantity.addEventListener("change", () => {
-      productElement.querySelector(
-        "[data-cart-product-price]"
-      ).innerHTML = `$ ${productAmount(productElement)}`;
-
-      const products = Array.from(
-        document.querySelectorAll("[data-cart-product]")
-      );
-      const subtotal = products.reduce((accumulator, product) => {
-        return accumulator + productAmount(product);
-      }, 0);
-
-      subototalElement.innerHTML = `$ ${subtotal}`;
-      totalElement.innerHTML = `$ ${
-        subtotal +
-        parseInt(shippingElement.dataset.cartShippingAmount) +
-        parseInt(taxElement.dataset.cartTaxAmount)
-      }`;
+  init() {
+    this.quantityElement.addEventListener("change", () => {
+      this.quantity = parseInt(this.quantityElement.value);
+      this.updatePrice();
+      this.cart.productUpdated(this);
     });
-  });
+  }
+
+  get price() {
+    return this.amount * this.quantity;
+  }
+
+  updatePrice() {
+    this.priceElement.innerHTML = `$ ${this.price}`;
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const cart = new Cart();
 });
-
-// document.addEventListener("DOMContentLoaded", () => {
-//   // convert to using data attributes
-//   // Example: data-cart-subtotal, data-cart-shipping, data-cart-tax, ...
-//   const subtotalEl = document.getElementById("subtotal_element");
-//   const shippingEl = document.getElementById("shipping");
-//   const taxEl = document.getElementById("tax");
-//   const totalEl = document.getElementById("total");
-
-//   const productElements = document.querySelectorAll("[data-cart-product]");
-//   productElements.forEach((productElement) => {
-//     // amount = productElement.dataset.amount // parseInt
-//     quantity = productElement.querySelector("[data-cart-product-quantity]")
-
-//     quantity.addEventListener("change", () => {
-//       // update product price
-//       // update subtotal - use `productElements`
-
-//       // this is logic for subtotal
-//       productElements.sum((product) => {
-//         amount = product.querySelector("[data-card-product-amount") // parseInt
-//         quantity = product.querySelector("[data-cart-product-quantity]") // value
-//         return amount * quantity
-//       })
-//       // update total
-//     })
-
-//   })
-
-//   // cijene
-//   const item1 = document.getElementById("item_1");
-//   const item2 = document.getElementById("item_2");
-
-//   const value1 = 250;
-//   const value2 = 150;
-
-//   item1.innerHTML = `$ ${value1}`;
-//   item2.innerHTML = `$ ${value2}`;
-
-//   // remove this
-//   // shippingEl.innerHTML = 5;
-//   // taxEl.innerHTML = 8;
-
-//   // quantity1
-//   // quantity2
-//   const quantitySelect = document.getElementById("quantity-0");
-//   const quantitySelect2 = document.getElementById("quantity-1");
-
-//   const updatePrice = () => {
-//     const quantity = parseInt(quantitySelect.value);
-//     const totalPrice = quantity * value1;
-//     item1.textContent = `$ ${totalPrice}`;
-
-//     const quantity2 = parseInt(quantitySelect2.value);
-//     const totalPrice2 = quantity2 * value2;
-//     item2.textContent = `$ ${totalPrice2}`;
-//     // update dom with subtotal
-//     subtotalEl.innerHTML = `$ ${totalPrice + totalPrice2}`;
-//     // update dom with shipping
-//     tax = parseInt(taxEl.dataset.taxAmount);
-//     shipping = parseInt(shippingEl.dataset.shippingAmount);
-//     totalEl.innerHTML = `$ ${totalPrice + totalPrice2 + tax + shipping}`;
-//   };
-
-//   updatePrice();
-
-//   // calcuate subtotal
-//   quantitySelect.addEventListener("change", updatePrice);
-//   quantitySelect2.addEventListener("change", updatePrice);
-// });
-
-// // removal of subotal summary
-
-// const orderSummaryEl = document.querySelector("[data-order-summary]");
-// const removeOrderSummaryEl = document.querySelector(
-//   "[data-remove-order-summary]"
-// );
-
-// function toggleVisibility() {
-//   if (orderSummaryEl.style.display === "none") {
-//     orderSummaryEl.style.display = "block"; // Show the element
-//   } else {
-//     orderSummaryEl.style.display = "none"; // Hide the element
-//   }
-// }
-// removeOrderSummaryEl.addEventListener("click", toggleVisibility);
-
-// // staviti tooggle u domcontentload
