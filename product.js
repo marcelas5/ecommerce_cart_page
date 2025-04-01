@@ -3,9 +3,7 @@ class Product {
     this.element = element;
     this.cart = cart;
     this.amount = parseInt(element.dataset.cartProductAmount);
-    this.quantityElement = element.querySelector(
-      "[data-cart-product-quantity]"
-    );
+    this.quantityElement = element.querySelector("[data-cart-product-quantity]");
     this.quantity = parseInt(this.quantityElement.value);
     this.priceElement = element.querySelector("[data-cart-product-price]");
   }

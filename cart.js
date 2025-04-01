@@ -10,20 +10,14 @@ class Cart {
       product.init();
       return product;
     });
-    this.orderSummaryEl = document.querySelector("[data-order-summary]");
-    this.removeOrderSummaryEl = document.querySelector(
-      "[data-remove-order-summary]"
-    );
-
-    // izbacit ovaj poziv u init() metodu
-    this.toggleVisibility();
     this.totalElement = document.querySelector("[data-cart-total]");
     this.shippingElement = document.querySelector("[data-cart-shipping]");
     this.taxElement = document.querySelector("[data-cart-tax]");
+    this.orderSummaryEl = document.querySelector("[data-order-summary]");
+    this.removeOrderSummaryEl = document.querySelector("[data-remove-order-summary]");
   }
 
   productUpdated() {
-    // update subtotal
     this.subtotalElement.innerHTML = `$ ${this.subtotal}`;
     this.totalElement.innerHTML = `$ ${
       this.subtotal +
@@ -38,12 +32,12 @@ class Cart {
     }, 0);
   }
 
-  toggleVisibility() {
+  init() {
     this.removeOrderSummaryEl.addEventListener("click", () => {
       if (this.orderSummaryEl.style.display === "none") {
-        this.orderSummaryEl.style.display = "block"; // Show the element
+        this.orderSummaryEl.style.display = "block";
       } else {
-        this.orderSummaryEl.style.display = "none"; // Hide the element
+        this.orderSummaryEl.style.display = "none";
       }
     });
   }
